@@ -19,13 +19,13 @@ class User(db.Model):
 
         id = db.Column(db.Integer, primary_key=True, autoincrement=True)
         username = db.Column(db.String(20), nullable=False, unique=True)
-        password = db.Column(db.string(50), nullable=False)
-        email = db.Column(db.string(50), nullable=False, unique=True)
-        first_name = db.Column(db.string(30), nullable=False)
-        last_name = db.Column(db.string(30), nullable=False)
+        password = db.Column(db.String, nullable=False)
+        email = db.Column(db.String(50), nullable=False, unique=True)
+        first_name = db.Column(db.String(30), nullable=False)
+        last_name = db.Column(db.String(30), nullable=False)
     
         @classmethod
-        def register(cls, username, password):
+        def register(cls, username, password, email, first_name, last_name):
             """Register user w/hashed password & return user."""
     
             hashed = bcrypt.generate_password_hash(password)
@@ -33,7 +33,7 @@ class User(db.Model):
             hashed_utf8 = hashed.decode("utf8")
     
             # return instance of user w/username and hashed pwd
-            return cls(username=username, password=hashed_utf8)
+            return cls(username=username, password=hashed_utf8, email=email, first_name=first_name, last_name=last_name)
     
         @classmethod
         def authenticate(cls, username, password):
