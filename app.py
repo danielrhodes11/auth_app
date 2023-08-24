@@ -90,6 +90,10 @@ def delete_user(username):
         flash("Please login first!", "danger")
         return redirect("/login")
     else:
+        username = session["username"]
+        feedback = Feedback.query.filter_by(username=username).all()
+        for fb in feedback:
+            db.session.delete(fb)
         user = User.query.filter_by(username=username).first()
         db.session.delete(user)
         db.session.commit()
@@ -156,8 +160,6 @@ def delete_feedback(feedback_id):
         flash("Feedback Deleted!", "info")
         return redirect(f"/users/{feedback.username}")
     
-
-    
 @app.route("/logout")
 def logout():
     """logout user"""
@@ -165,7 +167,6 @@ def logout():
     session.pop("username")
     flash("Goodbye!", "info")
     return redirect("/")
-
     
 @app.route("/secret")
 def secret():
