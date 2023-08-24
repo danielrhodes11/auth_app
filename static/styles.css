@@ -1,0 +1,78 @@
+
+body {
+    background-color: #f3f3f3;
+  }
+  
+  .container {
+    margin-top: 30px;
+  }
+  
+  /* Navbar */
+  .navbar {
+    border-bottom: 2px solid #0275d8;
+  }
+  
+  .navbar-brand {
+    font-size: 24px;
+  }
+  
+  .nav-item a {
+    margin-right: 10px;
+    font-size: 18px;
+  }
+  
+  /* Alerts */
+  .alert {
+    margin-top: 20px;
+  }
+  
+  /* Content Area */
+  .content {
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  
+  /* Feedback Card */
+  .card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  
+  .card-body {
+    padding: 15px;
+  }
+  
+  .card-title {
+    font-size: 20px;
+  }
+  
+  .card-subtitle {
+    font-size: 16px;
+  }
+  
+  .card-text {
+    font-size: 18px;
+  }
+  
+  .btn-danger {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+  
+  /* Button to add feedback */
+  .nav-link i.fas.fa-comments {
+    margin-right: 5px;
+  }
+  
+  /* Button for logout */
+  .nav-link i.fas.fa-sign-out-alt {
+    margin-right: 5px;
+  }
+  
+  /* User icon */
+  .nav-link i.fas.fa-user {
+    margin-right: 5px;
+  }
+  

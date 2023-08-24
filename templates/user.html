@@ -1,12 +1,37 @@
 {% extends 'base.html' %}
 
-{% block title %} <p>Welcome <span class="text-info">{{ user.username }}</span>!</p>{% endblock %}
-
 {% block content %}
+  
   <h2>User Profile</h2>
+  <hr>
   <p><strong>Username:</strong> {{ user.username }}</p>
   <p><strong>Email:</strong> {{ user.email }}</p>
   <p><strong>First Name:</strong> {{ user.first_name }}</p>
   <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+
+  <h4>Your Feedback:</h4>
+  <div class="mt-4">
+    {% for feedback in feedbacks %}
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h4 class="card-title text-info">{{ feedback.title }}</h4>
+              <p class="card-text">{{ feedback.content }}</p>
+            </div>
+            <a href="/feedback/{{ feedback.id }}/update" class="btn btn-primary btn-sm">
+              <i class="fas fa-edit"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="card mb-3">
+        <div class="card-body">
+          <p class="card-text"><em>No feedback yet!</p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
 {% endblock %}
 

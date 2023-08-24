@@ -41,7 +41,7 @@ def register():
         db.session.commit()
         session["username"] = user.username
         flash("Welcome! Successfully Created Your Account!", "success")
-        return redirect('/users/<username>')
+        return redirect(f"/users/{username}")
     else:
         return render_template("register.html", form=form)
     
@@ -60,7 +60,7 @@ def login():
         if user:
             session["username"] = user.username
             flash("Welcome Back!", "success")
-            return redirect("/users/<username>")
+            return redirect(f"/users/{username}")
         else:
             form.username.errors = ["Invalid username/password."]
             return render_template("login.html", form=form)
@@ -97,7 +97,7 @@ def delete_user(username):
         flash("User Deleted!", "info")
         return redirect("/")
     
-@app.route("/users/<username>/feedback/add", methods=["GET", "POST"])
+@app.route(f"/users/<username>/feedback/add", methods=["GET", "POST"])
 def add_feedback(username):
     """Adds feedback"""
     
@@ -110,7 +110,8 @@ def add_feedback(username):
         if form.validate_on_submit():
             title = form.title.data
             content = form.content.data
-            
+            username = session["username"]
+
             feedback = Feedback(title=title, content=content, username=username)
             db.session.add(feedback)
             db.session.commit()

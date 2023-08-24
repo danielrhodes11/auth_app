@@ -4,6 +4,7 @@
 <head>
   <link rel="stylesheet" href="https://bootswatch.com/4/flatly/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0/css/all.min.css">
+  <link rel="stylesheet" href="/static/styles.css">
 </head>
 
 <body>
@@ -13,10 +14,12 @@
       <ul class="nav navbar-nav flex-row float-right">
         {% if session['username'] %}
         <li class="nav-item">
+          <a class="nav-link" href="/users/<username>/feedback/add"><i class="fas fa-comments"></i> Add Feedback </a>
+        <li class="nav-item">
           <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </li>
         <li>
-            <a class="nav-link" href="#"><i class="fas fa-user"></i> {{ session['username'] }}</a>
+            <a class="nav-link" href="/users/<username>"><i class="fas fa-user"></i> {{ session['username'] }}</a>
         </li>
         {% else %}
         <li class="nav-item">
@@ -38,7 +41,7 @@
     {% endfor %}
 
     <h1>{% block title %}{% endblock %}</h1>
-    <hr>
+    
 
     <div class="content">
       {% block content %}{% endblock %}
