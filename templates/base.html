@@ -11,9 +11,12 @@
     <div class="container">
       <a href="/" class="navbar-brand"><i class="fas fa-lock"></i> SecureAuth</a>
       <ul class="nav navbar-nav flex-row float-right">
-        {% if session['usersame'] %}
+        {% if session['username'] %}
         <li class="nav-item">
           <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </li>
+        <li>
+            <a class="nav-link" href="#"><i class="fas fa-user"></i> {{ session['username'] }}</a>
         </li>
         {% else %}
         <li class="nav-item">
@@ -45,4 +48,3 @@
 </body>
 
 </html>
-
