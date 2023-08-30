@@ -37,14 +37,31 @@ def register():
         last_name = form.last_name.data
             
         user = User.register(username, password, email, first_name, last_name)
+        validation_token = Token(user)
         db.session.add(user)
         db.session.commit()
         session["username"] = user.username
         flash("Welcome! Successfully Created Your Account!", "success")
+        email_module.send(email, 'Welcome to my app! Please confirm you\'re human!', render_template("validation_email.html", token=token))
+        # Do some magic, create a token
         return redirect(f"/users/{username}")
     else:
         return render_template("register.html", form=form)
+
+@app.route("/validate", methods=["GET"])
+def validate():
+    tolkien = request.get('token')
+    token_obj = Token.query.filter_by(token = tolkien)
+    token_obj.used_date = # whatever
+    user = token_obj.user
+    user.active = True
+    db.session.add(user)
     
+    db.session.commit()
+    username = user.username
+    return redirect(f"/users/{username}")
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """login user"""
