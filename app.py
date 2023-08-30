@@ -1,7 +1,11 @@
-from flask import Flask, render_template, request, redirect, flash, session
+from flask import Flask, render_template, request, redirect, flash, session, url_for
 from flask_debugtoolbar import DebugToolbarExtension
-from models import connect_db, db, User, Feedback
+from models import connect_db, db, User, Feedback, Token
 from forms import UserForm, LoginForm, FeedbackForm
+import secrets
+from flask_mail import Mail, Message
+from sqlalchemy.exc import IntegrityError
+
 
 app = Flask(__name__)
 
@@ -11,6 +15,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 app.config["SECRET_KEY"] = "abc123"
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_DEFAULT_SENDER'] = 'danielrhodes47@gmail.com'
+app.config['MAIL_USERNAME'] = 'danielrhodes47@gmail.com'
+app.config['MAIL_PASSWORD'] = 'zexwizeccdaixqje'
+
 
 toolbar = DebugToolbarExtension(app)
 
@@ -30,6 +42,8 @@ def register():
 
     form = UserForm()
 
+    mail = Mail(app)
+
     if form.validate_on_submit():
         username = form.username.data
         password = form.password.data
@@ -37,18 +51,46 @@ def register():
         first_name = form.first_name.data
         last_name = form.last_name.data
 
-        user = User.register(username, password, email, first_name, last_name)
-        validation_token = Token(user)
+        user = User.register(username, password, email,
+                             first_name, last_name)
+        validation_token = Token(
+            token=secrets.token_urlsafe(16), username=username)
         db.session.add(user)
+        db.session.add(validation_token)
         db.session.commit()
-        session["username"] = user.username
-        flash("Welcome! Successfully Created Your Account!", "success")
-        email_module.send(email, 'Welcome to my app! Please confirm you\'re human!',
-                          render_template("validation_email.html", token=token))
-        # Do some magic, create a token
-        return redirect(f"/users/{username}")
+
+        verification_url = url_for(
+            "validate_token", username=username, token=validation_token.token, _external=True)
+
+        msg = Message(
+            "Welcome to my app! Please confirm you're human.", recipients=[email])
+        msg.html = render_template(
+            "validation_email.html", verification_url=verification_url)
+        mail.send(msg)
+
+        return render_template("verify_email.html", username=username)
     else:
         return render_template("register.html", form=form)
+
+
+@app.route("/validate_token/<username>/<token>")
+def validate_token(username, token):
+    """Validate user's email token"""
+
+    token = Token.query.filter_by(token=token).first()
+
+    if not token or token.username != username:
+        flash("Invalid token!", "danger")
+        return redirect("/login")
+
+    db.session.delete(token)
+    db.session.commit()
+
+    # Store the validated username in a temporary session key
+    session["_validated_username"] = username
+
+    flash("Account activated! You can now log in.", "success")
+    return redirect("/login")
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -64,9 +106,17 @@ def login():
         user = User.authenticate(username, password)
 
         if user:
-            session["username"] = user.username
-            flash("Welcome Back!", "success")
-            return redirect(f"/users/{username}")
+            # Retrieve the validated username from the temporary session key
+            validated_username = session.pop("_validated_username", None)
+
+            # Compare the validated username with the login username
+            if validated_username == username:
+                session["username"] = user.username
+                flash("Welcome Back!", "success")
+                return redirect(f"/users/{username}")
+            else:
+                flash("Please verify your email before logging in.", "danger")
+                return redirect("/login")
         else:
             form.username.errors = ["Invalid username/password."]
             return render_template("login.html", form=form)
@@ -102,6 +152,12 @@ def delete_user(username):
         for fb in feedback:
             db.session.delete(fb)
         user = User.query.filter_by(username=username).first()
+
+        # Delete associated tokens for the user
+        tokens = Token.query.filter_by(username=username).all()
+        for token in tokens:
+            db.session.delete(token)
+
         db.session.delete(user)
         db.session.commit()
         session.pop("username")
