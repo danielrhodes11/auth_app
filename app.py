@@ -38,10 +38,14 @@ def register():
         last_name = form.last_name.data
 
         user = User.register(username, password, email, first_name, last_name)
+        validation_token = Token(user)
         db.session.add(user)
         db.session.commit()
         session["username"] = user.username
         flash("Welcome! Successfully Created Your Account!", "success")
+        email_module.send(email, 'Welcome to my app! Please confirm you\'re human!',
+                          render_template("validation_email.html", token=token))
+        # Do some magic, create a token
         return redirect(f"/users/{username}")
     else:
         return render_template("register.html", form=form)

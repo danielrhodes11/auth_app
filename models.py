@@ -13,6 +13,14 @@ def connect_db(app):
     db.init_app(app)
     app.app_context().push()
 
+
+class Token(db.Model):
+    id = # ???
+    user = db.relationship('User')
+    created_date
+    validated
+    
+
 class User(db.Model):
     
         __tablename__ = "users"
@@ -23,6 +31,7 @@ class User(db.Model):
         email = db.Column(db.String(50), nullable=False, unique=True)
         first_name = db.Column(db.String(30), nullable=False)
         last_name = db.Column(db.String(30), nullable=False)
+        active = db.Column(db.Boolean, default=False, nullable=False)
     
         @classmethod
         def register(cls, username, password, email, first_name, last_name):
