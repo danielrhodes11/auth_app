@@ -114,6 +114,7 @@ def login():
                 return redirect(f"/users/{user.username}")
             else:
                 flash("Please verify your email before logging in.", "danger")
+                return redirect("/login")
         else:
             form.username.errors = ["Invalid username/password."]
             return render_template("login.html", form=form)
