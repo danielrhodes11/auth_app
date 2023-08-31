@@ -1,10 +1,18 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Welcome to My App!</h2>
-  <p>Please click the link below to confirm that you're human:</p>
-  <p><a href="{{ verification_url }}">Verify Email</a></p>
+<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+  <div style="max-width: 600px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+    <h2 style="color: #333;">Welcome to My App!</h2>
+    <p style="color: #777;">Please click the link below to confirm that you're human:</p>
+    <p><a href="{{ verification_url }}" style="display: inline-block; background-color: #007bff; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-weight: bold;">Verify Email</a></p>
+    <p style="color: #777;">If the link above doesn't work, you can copy and paste the following URL into your browser:</p>
+    <p style="color: #777;"><code>{{ verification_url }}</code></p>
+    <p style="color: #777;">Thank you for joining our community!</p>
+  </div>
+</div>
 {% endblock %}
+
 
 
 

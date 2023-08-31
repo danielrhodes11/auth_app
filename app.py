@@ -77,19 +77,21 @@ def register():
 def validate_token(username, token):
     """Validate user's email token"""
 
-    token = Token.query.filter_by(token=token).first()
-
-    if not token or token.username != username:
+    token_record = Token.query.filter_by(token=token).first()
+    if not token_record or token_record.username != username:
         flash("Invalid token!", "danger")
         return redirect("/login")
 
-    db.session.delete(token)
+    user = User.query.filter_by(username=username).first()
+    if user:
+        user.email_verified = True
+        db.session.commit()
+
+    db.session.delete(token_record)
     db.session.commit()
 
-    # Store the validated username in a temporary session key
-    session["_validated_username"] = username
+    flash("Email verified! You can now log in.", "success")
 
-    flash("Account activated! You can now log in.", "success")
     return redirect("/login")
 
 
@@ -106,17 +108,12 @@ def login():
         user = User.authenticate(username, password)
 
         if user:
-            # Retrieve the validated username from the temporary session key
-            validated_username = session.pop("_validated_username", None)
-
-            # Compare the validated username with the login username
-            if validated_username == username:
+            if user.email_verified:
                 session["username"] = user.username
-                flash("Welcome Back!", "success")
-                return redirect(f"/users/{username}")
+                flash(f"Welcome back, {user.username}!", "success")
+                return redirect(f"/users/{user.username}")
             else:
                 flash("Please verify your email before logging in.", "danger")
-                return redirect("/login")
         else:
             form.username.errors = ["Invalid username/password."]
             return render_template("login.html", form=form)
